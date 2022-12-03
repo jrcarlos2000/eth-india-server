@@ -68,9 +68,11 @@ app.post("/register-user", async (req : Request, res : Response)=>{
   try {
     const {address, email} = req.body;
     const db = await connectToDb();
-    db.collection("users").insertOne({address,email});
     const exist = await db.collection("users").findOne({address:
       { $regex: new RegExp("^" + address.toLowerCase(), "i") }});
+
+    if(!exist) db.collection("users").insertOne({address,email});
+
     res.status(200).send({
       msg : "Registered succesfully"
     })
@@ -83,22 +85,22 @@ app.post("/register-user", async (req : Request, res : Response)=>{
 app.post("/send-create-form-email", async (req : Request, res : Response)=>{
 
   try {
-    const {address} = req.body;
+    const {address, payload} = req.body;
     const db = await connectToDb();
     const item = await db.collection("users").findOne({address:
       { $regex: new RegExp("^" + address.toLowerCase(), "i") }})
     
     const toEmail = item.email;
-
+    
     const info = await transporter.sendMail({
       from : process.env.SENDER_EMAIL,
       to : toEmail,
-      subject : "From Created Msg",
-      text : "You have been issued a new form, "
+      subject : payload.title,
+      text : payload.body
     })
 
-    console.log(`Message send: ${info.messageId}`)
-    
+    console.log(`Message sent: ${info.messageId}`)
+
     res.status(200).send({
       msg : "Notification sent succesfully"
     })
