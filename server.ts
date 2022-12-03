@@ -110,6 +110,10 @@ app.post("/sns", async (req: Request, res: Response) => {
     return;
   }
 
+    res.status(200).send({
+      msg: "OK",
+    });
+
   // if (payload.Type === "Notification") {
 
   //   const obj = JSON.parse(payload["Message"]);
