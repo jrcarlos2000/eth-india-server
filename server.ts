@@ -114,8 +114,8 @@ app.post("/sns", async (req: Request, res: Response) => {
 
     const obj = JSON.parse(payload["Message"]);
 
-    if(obj["users"].length > 1) return;
-    if(obj["payload"]["data"]["app"]!="Eth India") return;
+    // if(obj["users"].length > 1) return;
+    // if(obj["payload"]["data"]["app"]!="Eth India") return;
 
     try{
       const info = await transporter.sendMail({
@@ -128,7 +128,9 @@ app.post("/sns", async (req: Request, res: Response) => {
       console.log(`Message sent: ${info.messageId}`);
 
     }catch(e){
-      return
+      res.status(500).send({
+        msg: "failed to send",
+      });
     }
 
     res.status(200).send({
