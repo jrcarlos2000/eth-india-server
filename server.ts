@@ -6,7 +6,7 @@ import { MongoClient, ObjectId } from "mongodb";
 // import { compileSolidityCode, findTopMatches ,buildTxPayload, getDiamondFacetsAndFunctions, getDiamondLogs, generateSelectorsData} from "./utils/utils";
 // import { Providers } from "./utils/providers";
 const cors = require("cors");
-const fetch = require('node-fetch');
+const fetch = require("node-fetch");
 const nodeMailer = require("nodemailer");
 const Validator = require("sns-payload-validator");
 
@@ -65,11 +65,9 @@ app.post("/register-user", async (req: Request, res: Response) => {
   try {
     const { address, email } = req.body;
     const db = await connectToDb();
-    const exist = await db
-      .collection("users")
-      .findOne({
-        address: { $regex: new RegExp("^" + address.toLowerCase(), "i") },
-      });
+    const exist = await db.collection("users").findOne({
+      address: { $regex: new RegExp("^" + address.toLowerCase(), "i") },
+    });
 
     if (!exist) db.collection("users").insertOne({ address, email });
 
@@ -84,85 +82,68 @@ app.post("/register-user", async (req: Request, res: Response) => {
 //sns POST
 
 app.post("/sns", async (req: Request, res: Response) => {
-
   const buffers = [];
 
-    for await (const chunk of req) {
-        buffers.push(chunk);
-    }
+  for await (const chunk of req) {
+    buffers.push(chunk);
+  }
 
-    const data = Buffer.concat(buffers).toString();
+  const data = Buffer.concat(buffers).toString();
 
-    if (!data) {
-        console.log("Invalid data received, hence skipping")
-        res.status(200).json({
-            "message": 'Invalid data received'
-        });
-        return;
-    }
+  if (!data) {
+    console.log("Invalid data received, hence skipping");
+    res.status(200).json({
+      message: "Invalid data received",
+    });
+    return;
+  }
 
-    const payload = JSON.parse(data);
+  const payload = JSON.parse(data);
+
+  try {
+    await Validator.validate(payload);
+  } catch (err) {
+    console.log("payload sender validation failed, hence skipping\n", payload);
+    res.status(200).json({
+      message: "Your message could not validated",
+    });
+    return;
+  }
+
+  if (payload.Type === "Notification") {
+    console.log("Notification :: \n", payload);
+    console.log("------------------------------------------------------");
+    console.log("------------------------------------------------------");
+    console.log("------------------------------------------------------");
+
+    const obj = JSON.parse(payload["Message"]);
+    // console.log("messaged received from EPNS :: " + obj['payload']['data']['amsg'])
+
+    if (obj["users"].length > 1) return;
+    if (obj["payload"]["data"]["app"] != "Eth India") return;
 
     try {
-        await Validator.validate(payload)
-    } catch (err) {
-        console.log('payload sender validation failed, hence skipping\n', payload);
-        res.status(200).json({
-            "message": 'Your message could not validated'
-        });
-        return;
+      const info = await transporter.sendMail({
+        from: process.env.SENDER_EMAIL,
+        to: "daniel2000035@icloud.com",
+        subject: "test",
+        text: "test",
+      });
+
+      console.log(`Message sent: ${info.messageId}`);
+    } catch (e) {
+      res.status(500).send({
+        msg: "failed to send",
+      });
     }
 
-    if (payload.Type === 'Notification') {
-        console.log('Notification :: \n', payload);
-        console.log('------------------------------------------------------');
-        console.log('------------------------------------------------------');
-        console.log('------------------------------------------------------');
-
-        const obj = JSON.parse(payload['Message']);
-        console.log("messaged received from EPNS :: " + obj['payload']['data']['amsg'])
-
-        if(obj["users"].length > 1) return;
-        if(obj["payload"]["data"]["app"] != "Eth India") return;
-
-        try{
-          const info = await transporter.sendMail({
-            from: process.env.SENDER_EMAIL,
-            to: "daniel2000035@icloud.com",
-            subject: "test",
-            text: "test",
-          });
-
-          console.log(`Message sent: ${info.messageId}`);
-
-        }catch(e){
-          res.status(500).send({
-            msg: "failed to send",
-          });
-        }
-
-        res.sendStatus(200);
-        return;
-    } else if (payload.Type === 'SubscriptionConfirmation') {
-        const url = payload.SubscribeURL;
-        console.log("SubscriptionConfirmation :: \n" + payload)
-        const response = await fetch(url);
-        if (response.status === 200) {
-            console.log('Subscription confirmed');
-            console.log('------------------------------------------------------');
-            console.log('------------------------------------------------------');
-            console.log('------------------------------------------------------');
-            res.sendStatus(200);
-            return;
-        } else {
-            console.error('Subscription failed');
-            res.sendStatus(500);
-            return;
-        }
-    } else {
-        console.log('Received message from sns', payload);
-        res.sendStatus(200);
-    }
+    res.sendStatus(200);
+    return;
+  } else {
+    res.status(500).send({
+      msg: "Message type is wrong",
+    });
+  }
 
   // if (payload.Type === "Notification") {
 
@@ -201,11 +182,9 @@ app.post("/send-create-form-email", async (req: Request, res: Response) => {
   try {
     const { address, payload } = req.body;
     const db = await connectToDb();
-    const item = await db
-      .collection("users")
-      .findOne({
-        address: { $regex: new RegExp("^" + address.toLowerCase(), "i") },
-      });
+    const item = await db.collection("users").findOne({
+      address: { $regex: new RegExp("^" + address.toLowerCase(), "i") },
+    });
 
     const toEmail = item.email;
     let parsedPayload = JSON.parse(payload);
