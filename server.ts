@@ -126,8 +126,8 @@ app.post("/sns", async (req: Request, res: Response) => {
       const info = await transporter.sendMail({
         from: process.env.SENDER_EMAIL,
         to: "daniel2000035@icloud.com",
-        subject: "test",
-        text: "test",
+        subject: obj["payload"]["notification"]["title"],
+        text: obj["payload"]["notification"]["body"],
       });
 
       console.log(`Message sent: ${info.messageId}`);
