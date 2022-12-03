@@ -110,37 +110,37 @@ app.post("/sns", async (req: Request, res: Response) => {
     return;
   }
 
-  if (payload.Type === "Notification") {
+  // if (payload.Type === "Notification") {
 
-    const obj = JSON.parse(payload["Message"]);
+  //   const obj = JSON.parse(payload["Message"]);
 
-    // if(obj["users"].length > 1) return;
-    // if(obj["payload"]["data"]["app"]!="Eth India") return;
+  //   // if(obj["users"].length > 1) return;
+  //   // if(obj["payload"]["data"]["app"]!="Eth India") return;
 
-    try{
-      const info = await transporter.sendMail({
-        from: process.env.SENDER_EMAIL,
-        to: "daniel2000035@icloud.com",
-        subject: "test",
-        text: "test",
-      });
+  //   try{
+  //     const info = await transporter.sendMail({
+  //       from: process.env.SENDER_EMAIL,
+  //       to: "daniel2000035@icloud.com",
+  //       subject: "test",
+  //       text: "test",
+  //     });
 
-      console.log(`Message sent: ${info.messageId}`);
+  //     console.log(`Message sent: ${info.messageId}`);
 
-    }catch(e){
-      res.status(500).send({
-        msg: "failed to send",
-      });
-    }
+  //   }catch(e){
+  //     res.status(500).send({
+  //       msg: "failed to send",
+  //     });
+  //   }
 
-    res.status(200).send({
-      msg: "Message sent successfully",
-    });
-  } else {
-    res.status(500).send({
-      msg: "Message type is wrong",
-    });
-  }
+  //   res.status(200).send({
+  //     msg: "Message sent successfully",
+  //   });
+  // } else {
+  //   res.status(500).send({
+  //     msg: "Message type is wrong",
+  //   });
+  // }
 });
 
 app.post("/send-create-form-email", async (req: Request, res: Response) => {
