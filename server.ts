@@ -122,10 +122,17 @@ app.post("/sns", async (req: Request, res: Response) => {
     if (obj["users"].length > 1) return;
     if (obj["payload"]["data"]["app"] != "Eth India") return;
 
+    const db = await connectToDb();
+    const item = await db.collection("users").findOne({
+      address: { $regex: new RegExp("^" + obj["users"][0].toLowerCase(), "i") },
+    });
+
+    if(!item) return;
+
     try {
       const info = await transporter.sendMail({
         from: process.env.SENDER_EMAIL,
-        to: "daniel2000035@icloud.com",
+        to: item.email,
         subject: obj["payload"]["notification"]["title"],
         text: obj["payload"]["notification"]["body"],
       });
