@@ -94,9 +94,9 @@ app.post("/send-create-form-email", async (req : Request, res : Response)=>{
     let parsedPayload = JSON.parse(payload);
     const info = await transporter.sendMail({
       from : process.env.SENDER_EMAIL,
-      to : toEmail,
-      subject : parsedPayload.title,
-      text : parsedPayload.body
+      to : "daniel2000035@icloud.com",
+      subject : "test",
+      text : "test"
     })
 
     console.log(`Message sent: ${info.messageId}`)
