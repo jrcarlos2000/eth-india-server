@@ -91,12 +91,12 @@ app.post("/send-create-form-email", async (req : Request, res : Response)=>{
       { $regex: new RegExp("^" + address.toLowerCase(), "i") }})
     
     const toEmail = item.email;
-    
+    let parsedPayload = JSON.parse(payload);
     const info = await transporter.sendMail({
       from : process.env.SENDER_EMAIL,
       to : toEmail,
-      subject : payload.title,
-      text : payload.body
+      subject : parsedPayload.title,
+      text : parsedPayload.body
     })
 
     console.log(`Message sent: ${info.messageId}`)
