@@ -1,48 +1,26 @@
-# facets.wiki
+# ETH India - Hideme.lol
 
 #### Ethereum Diamond Facet Library and Inspector
 
-Visit demo: https://facets.wiki
+Visit demo: https://hideme.lol
 
-Live api url: https://shark-app-ciezx.ondigitalocean.app
+Live api url: https://monkfish-app-c4db7.ondigitalocean.app/
 
 ## API Endpoints
 
-#### /facets
-
-GET
-
-optional keyword parameter
-
-search for facets in database
-
-#### /get-diamond-info
-POST
-
-Returns list of facets, and facet functions per diamond
-
-#### /add-facet
+#### /register-user
 
 POST
 
-Adds a facet to the database
+```javascript 
+params = {addresss, email} 
+```
+stores a user email linked to its address
 
-
-#### /get-facet-selectors
-
+#### /sns
 POST
 
-Returns list of facet selectors per facet address.
-
-
-#### /update-diamond
-
-POST
-
-Update diamonds with list of facet functions.
-
-Parameters: facetAddr, action, funcList
-
+Integrates push protocol and sends messages via mailserver from notifications@hideme.lol
 
 
 
