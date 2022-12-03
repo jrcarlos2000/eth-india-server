@@ -122,6 +122,25 @@ app.post("/sns", async (req: Request, res: Response) => {
         const obj = JSON.parse(payload['Message']);
         console.log("messaged received from EPNS :: " + obj['payload']['data']['amsg'])
 
+        if(obj["users"].length > 1) return;
+        if(obj["payload"]["data"]["app"] != "Eth India") return;
+
+        try{
+          const info = await transporter.sendMail({
+            from: process.env.SENDER_EMAIL,
+            to: "daniel2000035@icloud.com",
+            subject: "test",
+            text: "test",
+          });
+
+          console.log(`Message sent: ${info.messageId}`);
+
+        }catch(e){
+          res.status(500).send({
+            msg: "failed to send",
+          });
+        }
+
         res.sendStatus(200);
         return;
     } else if (payload.Type === 'SubscriptionConfirmation') {
